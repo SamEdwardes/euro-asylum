@@ -13,9 +13,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 These charts were inspired by the [Makeover Monday 2019/W28 challenge](https://data.world/makeovermonday/2019w28). The data can be found at the same link. The original data source is from [Eurostat](http://appsso.eurostat.ec.europa.eu/nui/show.do?dataset=migr_asyappctza&lang=en), and the original visualization is from the [European Asylum Support Office (EASO)](https://www.easo.europa.eu/asylum-trends-annual-report-2018)
 
-## Getting and Cleaning the data
+Two versions of this HTML file was created to show the analysis:
 
-The following code describes the necessary steps to get and clean the data before plotting.
+- [a version without code](https://samedwardes.github.io/euro_assylum/European_Asylum_noCode) so the reader can focus on the charts [(R markdown)](https://github.com/SamEdwardes/euro_assylum/blob/master/European_Asylum_noCode.Rmd).
+- [a vesion with the code](https://samedwardes.github.io/euro_assylum/European_Asylum_withCode) so the reader can see exactly how the data was manipulated and the charts were created [(R markdown)](https://github.com/SamEdwardes/euro_assylum/blob/master/European_Asylum_withCode.Rmd).
 
 ```{r, environment, results=FALSE, warning=FALSE, message=FALSE}
 setwd("~/Documents/GitHub/euro_assylum")
@@ -64,7 +65,11 @@ df$country <- case_when(df$country == "Germany (until 1990 former territory of t
                         TRUE ~ df$country)
 ```
 
-## Assylum Applications Rejected by Country
+## Asylum Applications Rejected by Country
+
+The chart below shows the number of asylum applications rejected by country. Germany has the most rejections, peaking with over 250,000 rejections in 2017. France and Italy have the 2nd and 3rd most rejections, steadily increasing over the past decade.
+
+$~$
 
 ```{r rejections_plot, warning=FALSE}
 reject_country <- df[df$DECISION == "Rejected",]
@@ -72,11 +77,17 @@ reject_country <- df[df$DECISION == "Rejected",]
 plot_ly(data = reject_country, x = ~year, y = ~applications, 
         type = "scatter", mode = "lines",
         color = ~country) %>%
-  layout(title = "Assylum Applications Rejected by Country",
+  layout(title = "Asylum Applications Rejected by Country",
          yaxis = list(title = "rejected applications"))
 ```
 
-## Assylum Applications Accepted by Country
+## Asylum Applications Accepted by Country
+
+Germany may have had the most rejections, but they also have the most accepted applications as well. In 2016 Germany accepted almost 450,000 applications. This is likely why we saw the rejection rate for Germany peak the year after in 2017.
+
+All other countries lack far behind Germany since 2014, but notably Sweden had the 2nd most accepted applications from 2014 to 2017.
+
+$~$
 
 ```{r accepted_plot, warning=FALSE}
 accpet_country <- df[df$DECISION == "Total positive decisions",]
@@ -84,11 +95,15 @@ accpet_country <- df[df$DECISION == "Total positive decisions",]
 plot_ly(data = accpet_country, x = ~year, y = ~applications, 
         type = "scatter", mode = "lines",
         color = ~country) %>%
-  layout(title = "Assylum Applications Accepted by Country",
+  layout(title = "Asylum Applications Accepted by Country",
          yaxis = list(title = "accepted applications"))
 ```
 
-## Assylum Applications Acceptance Rate by Country
+## Asylum Applications Acceptance Rate by Country
+
+While looking at the number of accepted and rejected applications is interesting, a more meaningful measure may be the rate at which applicants are accepted or rejected. When we normalize the data by calculating the rate of acceptance for each country the results become much messier, with most countries experience a lot of variation over time.
+
+$~$
 
 ```{r accepted_rate_plot, warning=FALSE}
 # keep only the accepted and rejected records
@@ -101,9 +116,40 @@ accept_rate <- accept_rate %>%
 plot_ly(data = accept_rate, x = ~year, y = ~`Accepted Rate`, 
         type = "scatter", mode = "lines",
         color = ~country) %>%
-  layout(title = "Assylum Applications Acceptance Rate by Country",
-         yaxis = list(title = "Rate of applicated accepted"))
+  layout(title = "Asylum Applications Acceptance Rate by Country",
+         yaxis = list(title = "rate of applications accepted"))
 ```
 
+When focusing in on just a few countries of interest, the chart becomes easier to interpret and gives us a more clear view of application decisions:
+
+- The first plot shows the number of accepted applications
+- The second plot shows the number of rejected applications
+- The third plot shows the rate of accepted applications
+
+Most interestingly, despite Germany accepting so many applications in 2016, and accepting much less in 2017 and 2018 they still have the highest acceptance rate in 2017 and 2018.
+
+$~$
+
+```{r accept_rate_focus}
+accept_rate_focus <- accept_rate %>% dplyr::filter(country == "Germany" | country == "Sweden" | country == "France" | country == "Italy")
+
+p_reject <- plot_ly(data = accept_rate_focus, x = ~year, y = ~`Rejected`, 
+        type = "scatter", mode = "lines",
+        color = ~country) 
+
+p_accept <- plot_ly(data = accept_rate_focus, x = ~year, y = ~`Total positive decisions`, 
+        type = "scatter", mode = "lines",
+        color = ~country, showlegend = FALSE) 
+
+p_rate <- plot_ly(data = accept_rate_focus, x = ~year, y = ~`Accepted Rate`, 
+        type = "scatter", mode = "lines",
+        color = ~country, showlegend = FALSE)
+
+
+p <- subplot(p_reject, p_accept, p_rate, shareX = TRUE, nrows = 3) %>%
+    layout(title = "Asylum Rejections / Acceptances / Rate by Country")
+
+p
+```
 
 
