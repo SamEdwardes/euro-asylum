@@ -1,0 +1,107 @@
+---
+title: "Asylum Applications in Europe"
+author: "Sam Edwardes"
+date: "2019-07-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Background
+
+These charts were inspired by the [Makeover Monday 2019/W28 challenge](https://data.world/makeovermonday/2019w28). The data can be found at the same link. The original data source is from [Eurostat](http://appsso.eurostat.ec.europa.eu/nui/show.do?dataset=migr_asyappctza&lang=en), and the original visualization is from the [European Asylum Support Office (EASO)](https://www.easo.europa.eu/asylum-trends-annual-report-2018)
+
+This version of the document does not include the R code used to generate the plots. The code can be found at
+
+```{r, environment, results=FALSE, warning=FALSE, message=FALSE}
+setwd("~/Documents/GitHub/courses/09_DevelopingDataProducts/week 3 - assignment")
+library("tidyverse")
+library("httr")
+library("readxl")
+library("plotly")
+```
+
+```{r load_data, results=FALSE, warning=FALSE, message=FALSE}
+file_name <- "eu_asylum.xls"
+if(!file.exists(file_name)){
+  download.file(url = "https://query.data.world/s/bgxvtr2aubwuin35e2tkkno2chbew5", destfile = file_name)
+}
+df_raw <- read_excel(file_name)
+```
+
+```{r clean_data, results=FALSE, warning=FALSE, message=FALSE}
+df <- df_raw
+
+# promote the headers
+colnames(df) <- as.character(unlist(df[1,]))
+df <- df[-1,]
+
+# remove total lines
+df <- df[c(-1, -34, -35, -68, -69, -102, -103, -136, -137, -170),]
+
+# remove the columns with no information
+df <- df %>% select(-SEX, -AGE)
+
+# remove the rows where DECISION == "Total"
+df <- df[df$DECISION != "Total",]
+
+# transform from "long" to "tall" data
+df <- df %>% gather(key = "year", value = "applications", `2009`:`2018`)
+
+# fix data types
+df$year <- as.numeric(df$year)
+df$applications <- as.numeric(df$applications)
+
+# Change the name of the GEO/TIME column
+names(df)[1] <- "country"
+
+# shorten "Germany (until 1990 former territory of the FRG)" to just "Germany"
+df$country <- case_when(df$country == "Germany (until 1990 former territory of the FRG)" ~ "Germany",
+                        TRUE ~ df$country)
+```
+
+## Assylum Applications Rejected by Country
+
+```{r rejections_plot, warning=FALSE}
+reject_country <- df[df$DECISION == "Rejected",]
+
+plot_ly(data = reject_country, x = ~year, y = ~applications, 
+        type = "scatter", mode = "lines",
+        color = ~country) %>%
+  layout(title = "Assylum Applications Rejected by Country",
+         yaxis = list(title = "rejected applications"))
+```
+
+## Assylum Applications Accepted by Country
+
+```{r accepted_plot, warning=FALSE}
+accpet_country <- df[df$DECISION == "Total positive decisions",]
+
+plot_ly(data = accpet_country, x = ~year, y = ~applications, 
+        type = "scatter", mode = "lines",
+        color = ~country) %>%
+  layout(title = "Assylum Applications Accepted by Country",
+         yaxis = list(title = "accepted applications"))
+```
+
+## Assylum Applications Acceptance Rate by Country
+
+```{r accepted_rate_plot, warning=FALSE}
+# keep only the accepted and rejected records
+accept_rate <- df[df$DECISION == "Total positive decisions" | df$DECISION == "Rejected",]
+accept_rate <- accept_rate %>% spread(key = DECISION, value = applications)
+accept_rate <- accept_rate %>%
+  mutate(total = `Rejected` + `Total positive decisions`,
+         `Accepted Rate` = `Total positive decisions` / `total`)
+
+plot_ly(data = accept_rate, x = ~year, y = ~`Accepted Rate`, 
+        type = "scatter", mode = "lines",
+        color = ~country) %>%
+  layout(title = "Assylum Applications Acceptance Rate by Country",
+         yaxis = list(title = "Rate of applicated accepted"))
+```
+
+
+
