@@ -11,14 +11,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Background
 
-This chart was inspired by the [Makeover Monday 2019/W28 challenge](https://data.world/makeovermonday/2019w28). The data can be found at the same link. The original data source is from [Eurostat](http://appsso.eurostat.ec.europa.eu/nui/show.do?dataset=migr_asyappctza&lang=en), and the original visualization is from the [European Asylum Support Office (EASO)](https://www.easo.europa.eu/asylum-trends-annual-report-2018)
+These charts were inspired by the [Makeover Monday 2019/W28 challenge](https://data.world/makeovermonday/2019w28). The data can be found at the same link. The original data source is from [Eurostat](http://appsso.eurostat.ec.europa.eu/nui/show.do?dataset=migr_asyappctza&lang=en), and the original visualization is from the [European Asylum Support Office (EASO)](https://www.easo.europa.eu/asylum-trends-annual-report-2018)
 
 ## Getting and Cleaning the data
 
 The following code describes the necessary steps to get and clean the data before plotting.
 
 ```{r, environment, results=FALSE, warning=FALSE, message=FALSE}
-setwd("~/Documents/GitHub/courses/09_DevelopingDataProducts/week 3 - assignment")
+setwd("~/Documents/GitHub/euro_assylum")
 library("tidyverse")
 library("httr")
 library("readxl")

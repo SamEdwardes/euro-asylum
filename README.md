@@ -1,1 +1,3 @@
-# euro_assylum
+# European Asylum Charts using Plotly
+
+These charts were inspired by the [Makeover Monday 2019/W28 challenge](https://data.world/makeovermonday/2019w28). The data can be found at the same link. The original data source is from [Eurostat](http://appsso.eurostat.ec.europa.eu/nui/show.do?dataset=migr_asyappctza&lang=en), and the original visualization is from the [European Asylum Support Office (EASO)](https://www.easo.europa.eu/asylum-trends-annual-report-2018)
