@@ -4,5 +4,5 @@ These charts were inspired by the [Makeover Monday 2019/W28 challenge](https://d
 
 Two versions of this HTML file was created to show the analysis:
 
-- [a version without code](https://samedwardes.github.io/euro-asylum/European_Asylum_noCode) so the reader can focus on the charts [(R markdown)](https://github.com/SamEdwardes/euro-asylum/blob/master/European_Asylum_noCode.Rmd).
-- [a vesion with the code](https://samedwardes.github.io/euro-asylum/European_Asylum_withCode) so the reader can see exactly how the data was manipulated and the charts were created [(R markdown)](https://github.com/SamEdwardes/euro-asylum/blob/master/European_Asylum_withCode.Rmd).
+- [a version without code](https://samedwardes.com/euro-asylum/European_Asylum_noCode) so the reader can focus on the charts [(R markdown)](https://samedwardes.com/euro-asylum/European_Asylum_noCode.Rmd).
+- [a version with the code](https://samedwardes.com/euro-asylum/European_Asylum_withCode) so the reader can see exactly how the data was manipulated and the charts were created [(R markdown)](https://samedwardes.com/euro-asylum/European_Asylum_withCode.Rmd).
